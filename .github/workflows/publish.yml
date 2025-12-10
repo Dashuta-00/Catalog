@@ -1,0 +1,35 @@
+name: Publish Template # Название workflow
+
+# Триггеры запуска
+on:
+  push:
+    tags:
+ 
+      - 'v*' # Запуск при пуше тега, начинающегося с 'v' >> git push origin v1.0.0 
+  workflow_dispatch: # Возможность ручного запуска из UI github
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest # Запуск на Ubuntu
+
+    permissions:
+      contents: read  # Чтение содержимого репозитория
+      packages: write # Запись пакетов
+
+    steps:
+    - uses: actions/checkout@v4 # Клонирование репозитория
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.x.x' # Установка .NET 9
+
+    - name: Pack
+      run: dotnet pack --configuration Release # Сборка NuGet-пакет в Release-режиме
+
+    # Указание источника пакетов GitHub 
+    # и публикация собранного NuGet-пакета
+    - name: Publish to GitHub Packages
+      run: |
+        dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+        dotnet nuget push bin/Release/*.nupkg --source github --api-key ${{ secrets.GITHUB_TOKEN }}
