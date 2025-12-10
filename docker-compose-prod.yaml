@@ -1,0 +1,36 @@
+﻿# docker compose -f docker-compose-prod.yaml up -d
+# docker compose -f docker-compose-prod.yaml down -v
+
+services:
+  catalog_db:
+    container_name: catalog-db-prod
+    image: postgres:14
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=12345678
+      - POSTGRES_DB=catalog-db
+    restart: always
+    ports:
+      - "7411:5432"
+    volumes:
+      - postgres_catalog:/var/lib/postgresql/data/
+      
+  catalog_api:
+    container_name: catalog-api
+    build:
+      context: .
+      dockerfile: ./dockerfile-catalog
+      args: 
+        - BUILDKIT_INLINE_CACHE=0
+    ports:
+      - "7301:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      # - ConnectionStrings__PgConnection=...
+      # - MediatR__LicenseKey=...
+    depends_on:
+      - catalog_db
+    restart: unless-stopped
+        
+volumes:
+  postgres_catalog:

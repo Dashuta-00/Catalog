@@ -1,0 +1,19 @@
+﻿# docker compose -f docker-compose-dev.yaml up -d
+# docker compose -f docker-compose-dev.yaml down -v
+
+services:
+  catalog_db:
+    container_name: catalog-db-dev
+    image: postgres:14
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=12345678
+      - POSTGRES_DB=catalog-db
+    restart: always
+    ports:
+      - "7101:5432"
+    volumes:
+      - postgres_catalog:/var/lib/postgresql/data/
+        
+volumes:
+  postgres_catalog:
