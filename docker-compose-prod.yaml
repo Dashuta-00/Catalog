@@ -4,7 +4,7 @@
 services:
   catalog_db:
     container_name: catalog-db-prod
-    image: postgres:14
+    image: postgres
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=12345678
@@ -13,7 +13,7 @@ services:
     ports:
       - "7411:5432"
     volumes:
-      - postgres_catalog:/var/lib/postgresql/data/
+      - postgres_catalog:/var/lib/postgresql/
       
   catalog_api:
     container_name: catalog-api
