@@ -1,6 +1,8 @@
 ﻿using Basket.API.Infrastructure;
 using Basket.API.Models.ShoppingCart;
+using Basket.API.Validation;
 using Carter;
+using Common.Kernel.Behaviors;
 using Common.Kernel.Exceptions.Handler;
 using FluentValidation;
 using Marten;
@@ -36,7 +38,7 @@ public static class DependencyInjection
         //     provider.GetRequiredService<IDistributedCache>()
         //     ));
         
-        services.AddSingleton<ICartRepository, CartRepository>();
+        services.AddScoped<ICartRepository, CartRepository>();
         services.Decorate<ICartRepository, RedisCartCacheRepository>();
         
         services.AddCarter();
@@ -48,7 +50,10 @@ public static class DependencyInjection
         {
              config.LicenseKey = licenseKey;
              config.RegisterServicesFromAssembly(assembly);
+             config.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
+        
+        services.AddValidatorsFromAssembly(assembly);
         
         var connectionString = configuration.GetConnectionString("PgConnection")!;
 

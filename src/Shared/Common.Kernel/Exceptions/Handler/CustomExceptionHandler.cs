@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +20,12 @@ public class CustomExceptionHandler : IExceptionHandler
                 nf.Message
                 ),
             
+            ValidationException fv => (
+                StatusCodes.Status400BadRequest,
+                "ValidationError",
+                fv.Message
+                ),
+            
             _ => (
                 StatusCodes.Status500InternalServerError,
                 "InternalServerError",
@@ -37,7 +44,22 @@ public class CustomExceptionHandler : IExceptionHandler
         };
         
         problemDetails.Extensions.Add("traceId", httpContext.TraceIdentifier);
-        problemDetails.Extensions.Add("errorMessage", exception.Message);
+
+        if (exception is ValidationException validationException)
+        {
+            var errors = validationException.Errors?
+                .Select(x => new { x.PropertyName, x.ErrorMessage })
+                .ToList();
+
+            if (errors is not null && errors.Count != 0)
+            {
+                problemDetails.Extensions.Add("ValidationException", errors);
+            }
+        }
+        else
+        {
+            problemDetails.Extensions.Add("errorMessage", exception.Message);
+        }
 
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
         
