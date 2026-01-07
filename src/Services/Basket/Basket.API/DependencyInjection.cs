@@ -1,12 +1,10 @@
 ﻿using Basket.API.Infrastructure;
 using Basket.API.Models.ShoppingCart;
-using Basket.API.Validation;
 using Carter;
 using Common.Kernel.Behaviors;
 using Common.Kernel.Exceptions.Handler;
 using FluentValidation;
 using Marten;
-using Microsoft.Extensions.Caching.Distributed;
 
 namespace Basket.API;
 
