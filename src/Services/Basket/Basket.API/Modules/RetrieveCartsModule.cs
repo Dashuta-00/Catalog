@@ -2,7 +2,6 @@
 using Basket.API.Dto.RemoveCart;
 using Basket.API.Dto.RetrieveCart;
 using Basket.API.Dto.SaveCart;
-using Basket.API.Models.ShoppingCart;
 using Basket.API.ShoppingBasket.Remove;
 using Basket.API.ShoppingBasket.Retrieve;
 using Basket.API.ShoppingBasket.Save;
@@ -24,13 +23,13 @@ public class RetrieveCartsModule : ControllerBase, ICarterModule
                     {
                         var query = new RetrieveCartQuery(accountName);
                         var result = await sender.Send(query);
-                        var response = result.Adapt<RetrieveCartResponse>();
+                        var response = result.Adapt<RetrieveCartResult>();
                         return Results.Ok(response);
                     })
                 .WithName("RetrieveCart")
                 .WithSummary("Retrieve the cart by user account")
                 .WithDescription("Retrieve the cart items by user account")
-                .Produces<RetrieveCartResponse>(StatusCodes.Status200OK)
+                .Produces<RetrieveCartResult>(StatusCodes.Status200OK)
                 .IncludeInOpenApi();
         
         app.MapPost("/cart",

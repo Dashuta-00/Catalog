@@ -1,5 +1,4 @@
-﻿using Basket.API.Dto.RetrieveCart;
-using Basket.API.Models.ShoppingCart;
+﻿using Basket.API.Models.ShoppingCart;
 
 namespace Basket.API.ShoppingBasket.Retrieve;
 
