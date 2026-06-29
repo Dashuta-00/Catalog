@@ -74,7 +74,44 @@ services:
       - basket_db
       - basket_redis
     restart: unless-stopped
+    
+  promotion_db:
+    container_name: promotion-db-prod
+    image: mysql:latest
+    environment:
+      - MYSQL_ROOT_PASSWORD=12345678
+      - MYSQL_DATABASE=promotion-db
+    restart: always
+    ports:
+      - "7403:3306"
+    volumes:
+      - mysql_promotion:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p12345678"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+  
+  promotion_api:
+    container_name: promotion-api
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: ./dockerfile-promotion
+      args:
+        - BUILDKIT_INLINE_CACHE=0
+    ports:
+      - "7303:8080"
+      - "7313:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    depends_on:
+      promotion_db:
+        condition: service_healthy
+    restart: unless-stopped
+               
 volumes:
   postgres_catalog_prod:
   postgres_basket_prod:
   redis_basket_prod:
+  mysql_promotion:

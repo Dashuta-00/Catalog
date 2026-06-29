@@ -1,0 +1,53 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Promotion.Grpc.Protos";
+
+service PromoService{
+    rpc GetPromo(GetPromoRequest) returns(PromoModel);
+    rpc CreatePromo(CreatePromoRequest) returns(CreatePromoResponse);
+    rpc UpdatePromo(UpdatePromoRequest) returns(UpdatePromoResponse);
+    rpc DeletePromo(DeletePromoRequest) returns(DeletePromoResponse);
+}
+    
+message GetPromoRequest{
+    string catalog_item_id = 1;
+}
+
+message PromoModel{
+  string id = 1;
+  string catalog_item_id = 2;
+  string title = 3;
+  double value = 4;
+}
+
+message CreatePromoRequest{
+  string catalog_item_id = 1;
+  string title = 2;
+  double value = 3;
+}
+
+message CreatePromoResponse{
+  string id = 1;
+  bool success = 2;
+  string description = 3;
+}
+
+message UpdatePromoRequest{
+  string id = 1;
+  string title = 2;
+  double value = 3;
+}
+
+message UpdatePromoResponse{
+  bool success = 1;
+  string description = 2;
+}
+
+message DeletePromoRequest{
+  string catalog_item_id = 1;
+}
+
+message DeletePromoResponse{
+  bool success = 1;
+  string description = 2;
+}
