@@ -3,8 +3,11 @@ using Basket.API.Models.ShoppingCart;
 using Carter;
 using Common.Kernel.Behaviors;
 using Common.Kernel.Exceptions.Handler;
+using Common.Kernel.OpenApi.Filters;
 using FluentValidation;
 using Marten;
+using Promotion.Grpc.Protos;
+using Scalar.AspNetCore;
 
 namespace Basket.API;
 
@@ -16,11 +19,12 @@ public static class DependencyInjection
     )
     {
         services.AddExceptionHandler<CustomExceptionHandler>();
-        //автоматическое описание эндпоинтов для swagger
         services.AddEndpointsApiExplorer();
-        //генерация swagger документации
-        
-        services.AddSwaggerGen();
+
+        services.AddOpenApi(options =>
+        {
+            options.AddDocumentTransformer<SnakeCaseSchemaTransformer>();
+        });
         
         services.AddValidatorsFromAssemblyContaining(typeof(Program));
         var redisConnectionString = configuration.GetConnectionString("RedisConnection");
@@ -60,6 +64,12 @@ public static class DependencyInjection
                 options.Connection(connectionString);
                 options.Schema.For<ShoppingCart>().Identity(x => x.AccountName);
             }).UseLightweightSessions();
+
+        var promotionService = configuration.GetSection("GrpcServices:PromotionService").Value!;
+        services.AddGrpcClient<PromoService.PromoServiceClient>(options =>
+        {
+            options.Address =  new Uri(promotionService);
+        });
         
         return services;
     }
@@ -69,11 +79,8 @@ public static class DependencyInjection
         app.UseExceptionHandler(options => { });
         app.MapCarter();
 
-        app.UseSwagger();
-        app.UseSwaggerUI(options =>
-        {
-            options.SwaggerEndpoint("/swagger/v1/swagger.json", "Basket API v1");
-        });
+        app.MapOpenApi();                  
+        app.MapScalarApiReference();  
         
         return app;
     }

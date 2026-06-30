@@ -1,4 +1,4 @@
-﻿# docker compose -f docker-compose-dev.yaml up -d
+﻿# docker compose -f docker-compose-dev.yaml up -d --build
 # docker compose -f docker-compose-dev.yaml down -v
 
 services:
@@ -49,7 +49,30 @@ services:
       - "7103:3306"
     volumes:
       - mysql_promotion:/var/lib/mysql
-        
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-p12345678" ]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+  
+  promotion_api:
+    container_name: promotion-api
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: ./dockerfile-promotion
+      args:
+        - BUILDKIT_INLINE_CACHE=0
+    ports:
+      - "7003:8080"
+      - "7013:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    depends_on:
+      promotion_db:
+        condition: service_healthy
+    restart: unless-stopped
+    
 volumes:
   postgres_catalog:
   postgres_basket:

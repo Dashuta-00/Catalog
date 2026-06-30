@@ -17,7 +17,7 @@ public class GetPromoByCatalogItemIdQueryHandler(IPromoRepository promoRepositor
         {
             throw new RpcException(
                 new Status(StatusCode.NotFound,
-                $"not fount {request.CatalogItemId}"));
+                $"not found {request.CatalogItemId}"));
         }
         
         var result = promo.Adapt<PromoModel>();

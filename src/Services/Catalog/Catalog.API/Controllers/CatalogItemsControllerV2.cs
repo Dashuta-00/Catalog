@@ -1,9 +1,7 @@
-﻿using Asp.Versioning;
-using Catalog.Application.Queries.CatalogItemQueries;
+﻿using Catalog.Application.Queries.CatalogItemQueries;
 using Catalog.Application.Responses.CatalogItemResponses;
 using Catalog.Domain.Specifications;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace Catalog.API.Controllers;
 
@@ -14,7 +12,6 @@ public class CatalogItemsControllerV2 : ApiController
 {
     [HttpGet]
     [ProducesResponseType(typeof(GetCatalogItemsResultV2), StatusCodes.Status200OK)]
-    [SwaggerOperation(Tags = ["CatalogItemsControllerV2"])]
     public async Task<ActionResult<GetCatalogItemsResultV2>> GetAllCatalogItems([FromQuery]QueryArgs? queryArgs)
     {
         var query = new GetCatalogItemsQueryV2(queryArgs!);

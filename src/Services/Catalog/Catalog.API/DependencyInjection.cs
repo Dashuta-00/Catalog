@@ -1,7 +1,7 @@
 using Asp.Versioning;
 using Catalog.Domain.Repositories;
 using Catalog.Infrastructure.Repositories;
-using Microsoft.OpenApi.Models;
+using Scalar.AspNetCore;
 
 namespace Catalog.API;
 
@@ -25,23 +25,26 @@ public static class DependencyInjection
 		
 		services.AddControllers();
 		services.AddEndpointsApiExplorer();
-		services.AddSwaggerGen(config =>
+		services.AddOpenApi(options =>
 		{
-			config.SwaggerDoc("v1", new OpenApiInfo
+			options.AddDocumentTransformer((document, context, cancellationToken) =>
 			{
-				Title = "Catalog API",
-				Version = "v1",
+				switch (context.DocumentName)
+				{
+					case "v1":
+						document.Info.Title = "Catalog API";
+						document.Info.Version = "v1";
+						document.Info.Description = "Catalog API Version 1";
+						break;
+					case "v2":
+						document.Info.Title = "Catalog API";
+						document.Info.Version = "v2";
+						document.Info.Description = "Catalog API Version 2";
+						break;
+				}
+
+				return Task.CompletedTask;
 			});
-			config.SwaggerDoc("v2", new OpenApiInfo
-			{
-				Title = "Catalog API",
-				Version = "v2",
-			});
-			
-			config.EnableAnnotations();
-			
-			var basePath = AppContext.BaseDirectory;
-			config.IncludeXmlComments(Path.Combine(basePath, "Catalog.Domain.xml"));
 		});
 		services.AddTransient<IBrandRepository, CatalogRepository>();
 		services.AddTransient<ICategoryRepository, CatalogRepository>();
@@ -62,12 +65,8 @@ public static class DependencyInjection
 	{
 		app.MapControllers();
 		
-		app.UseSwagger();
-		app.UseSwaggerUI(options =>
-		{
-			options.SwaggerEndpoint("/swagger/v1/swagger.json", "Catalog API v1");
-			options.SwaggerEndpoint("/swagger/v2/swagger.json", "Catalog API v2");
-		});
+		app.MapOpenApi();
+		app.MapScalarApiReference();
 
 		return app;
 	}
