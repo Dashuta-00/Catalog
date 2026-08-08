@@ -58,6 +58,7 @@ services:
 
   basket_api:
     container_name: basket-api
+    platform: linux/amd64
     build:
       context: .
       dockerfile: ./dockerfile-basket
@@ -69,10 +70,12 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       # - ConnectionStrings__PgConnection=...
       # - ConnectionStrings__RedisConnection=...
+      # - GrpcServices__PromotionService=...
       # - MediatR__LicenseKey=...
     depends_on:
       - basket_db
       - basket_redis
+      - promotion_api
     restart: unless-stopped
     
   promotion_db:
