@@ -9,15 +9,17 @@ namespace Promotion.Grpc.UseCases.GetPromo;
 public class GetPromoByCatalogItemIdQueryHandler(IPromoRepository promoRepository)
 : IQueryHandler<GetPromoByCatalogItemIdQuery, PromoModel>
 {
-    public async Task<PromoModel> Handle(GetPromoByCatalogItemIdQuery request, CancellationToken cancellationToken)
+    public async Task<PromoModel> Handle(GetPromoByCatalogItemIdQuery query, CancellationToken cancellationToken)
     {
-        var promo = await promoRepository.GetByCatalogItemIdAsync(request.CatalogItemId);
+        var promo = await promoRepository.GetByCatalogItemIdAsync(query.CatalogItemId);
 
         if (promo is null)
         {
-            throw new RpcException(
-                new Status(StatusCode.NotFound,
-                $"not found {request.CatalogItemId}"));
+            return new PromoModel
+            {
+                CatalogItemId = query.CatalogItemId,
+                Value = 0
+            };
         }
         
         var result = promo.Adapt<PromoModel>();

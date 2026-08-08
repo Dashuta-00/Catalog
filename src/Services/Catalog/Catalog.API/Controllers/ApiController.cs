@@ -1,10 +1,9 @@
-﻿using Asp.Versioning;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Catalog.API.Controllers;
 
-[ApiVersion("1")]
+[Asp.Versioning.ApiVersion("1")]
 [ApiController]
 [Route("api/v{version:apiVersion}/[controller]")]
 public class ApiController : ControllerBase
