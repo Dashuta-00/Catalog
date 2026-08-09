@@ -26,9 +26,16 @@ public class SaveCartCommandHandler(ICartRepository cartRepository, PromoService
         foreach (var item in cart.Items)
         {
             var discount = await GetDiscountForItemAsync(cancellationToken, item);
-            if (discount is null) continue; 
-            item.UnitPrice -= (decimal)discount.Value;
+            if (discount is null) continue;
+
+            item.UnitPrice = ApplyDiscount(item.UnitPrice, (decimal)discount.Value);
         }
+    }
+
+    private static decimal ApplyDiscount(decimal unitPrice, decimal discount)
+    {
+        var newPrice = unitPrice - discount;
+        return newPrice < 0 ? 0m : newPrice;
     }
 
     private async Task<PromoModel?> GetDiscountForItemAsync(CancellationToken cancellationToken, ShoppingCartItem item)
