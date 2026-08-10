@@ -13,7 +13,7 @@ public class CreatePromoCommandHandler(IPromoRepository promoRepository)
     {
         var promo = command.Promo.Adapt<Promo>();
 
-        var success = await promoRepository.CreateAsync(promo);
+        var success = await promoRepository.CreateAsync(promo, cancellationToken);
 
         var result = new CreatePromoResponse
         {

@@ -11,7 +11,7 @@ public class GetPromoByCatalogItemIdQueryHandler(IPromoRepository promoRepositor
 {
     public async Task<PromoModel> Handle(GetPromoByCatalogItemIdQuery query, CancellationToken cancellationToken)
     {
-        var promo = await promoRepository.GetByCatalogItemIdAsync(query.CatalogItemId);
+        var promo = await promoRepository.GetByCatalogItemIdAsync(query.CatalogItemId, cancellationToken);
 
         if (promo is null)
         {

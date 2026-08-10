@@ -12,7 +12,7 @@ public class UpdatePromoCommandHandler(IPromoRepository promoRepository) : IComm
     {
         var updatePromoModel = command.Promo.Adapt<UpdatePromoModel>();
 
-        var success = await promoRepository.UpdateAsync(updatePromoModel);
+        var success = await promoRepository.UpdateAsync(updatePromoModel, cancellationToken);
         
         return new UpdatePromoResponse
         {

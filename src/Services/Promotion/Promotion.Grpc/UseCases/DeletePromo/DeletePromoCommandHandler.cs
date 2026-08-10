@@ -13,7 +13,7 @@ public class DeletePromoCommandHandler(IPromoRepository promoRepository)
     {
         var deleteModel = request.Promo.Adapt<DeletePromoModel>();
 
-        var success = await promoRepository.DeleteByCatalogItemIdAsync(deleteModel);
+        var success = await promoRepository.DeleteByCatalogItemIdAsync(deleteModel, cancellationToken);
         
         var result = new DeletePromoResponse
         {

@@ -7,7 +7,7 @@ namespace Promotion.Grpc.Persistence.Repositories;
 
 public class PromoRepository(IDbConnection connection) : IPromoRepository
 {
-    public async Task<Promo?> GetByCatalogItemIdAsync(string? catalogItemId)
+    public async Task<Promo?> GetByCatalogItemIdAsync(string catalogItemId, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(catalogItemId);
 
@@ -16,25 +16,38 @@ public class PromoRepository(IDbConnection connection) : IPromoRepository
                                              WHERE CatalogItemId = @catalogItemId
                                              LIMIT 1;
                                              """;
+        
         var result = await connection.QueryFirstOrDefaultAsync<Promo>(
-            selectByCatalogItemId, new { CatalogItemId = catalogItemId });
+            new  CommandDefinition(
+                selectByCatalogItemId,
+                new { CatalogItemId = catalogItemId },
+                cancellationToken: cancellationToken));
         
         return result;
     }
 
-    public async Task<bool> CreateAsync(Promo? promo)
+    public async Task<bool> CreateAsync(Promo promo, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(promo);
+        
         const string insertPromo = """
                                    INSERT INTO Promo (Id, CatalogItemId, Title, Value)
                                    VALUES (@Id, @CatalogItemId, @Title, @Value);
                                    """;
 
-        var result = await connection.ExecuteAsync(insertPromo, promo);
+        var result = await connection.ExecuteAsync(
+            new CommandDefinition(
+                insertPromo,
+                promo,
+                cancellationToken: cancellationToken));
+            
         return result > 0;
     }
 
-    public async Task<bool> UpdateAsync(UpdatePromoModel? updatePromoModel)
+    public async Task<bool> UpdateAsync(UpdatePromoModel updatePromoModel, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(updatePromoModel);
+        
         const string updatePromo = """
                                    UPDATE Promo
                                    SET 
@@ -42,21 +55,31 @@ public class PromoRepository(IDbConnection connection) : IPromoRepository
                                        Value = @Value
                                    WHERE Id = @Id;
                                    """;
-        
-        var result = await connection.ExecuteAsync(updatePromo, updatePromoModel);
+
+        var result = await connection.ExecuteAsync(
+            new CommandDefinition(
+                updatePromo,
+                updatePromoModel,
+                cancellationToken: cancellationToken));
+            
         return result > 0;
     }
 
-    public async Task<bool> DeleteByCatalogItemIdAsync(DeletePromoModel? deletePromoModel)
+    public async Task<bool> DeleteByCatalogItemIdAsync(DeletePromoModel deletePromoModel, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(deletePromoModel);
-
+        
         const string deletePromo = """
                                    DELETE FROM Promo
                                    WHERE CatalogItemId = @CatalogItemId;
                                    """;
-        
-        var result = await connection.ExecuteAsync(deletePromo, deletePromoModel);
+
+        var result = await connection.ExecuteAsync(
+            new CommandDefinition(
+                deletePromo, 
+                deletePromoModel, 
+                cancellationToken: cancellationToken));
+            
         return result > 0;
     }
 }
