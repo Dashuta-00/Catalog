@@ -12,7 +12,7 @@ public class PromoRepository(IDbConnection connection) : IPromoRepository
         ArgumentNullException.ThrowIfNull(catalogItemId);
 
         const string selectByCatalogItemId = """
-                                             SELECT * FROM Promo
+                                             SELECT Id, CatalogItemId, Title, Value FROM Promo
                                              WHERE CatalogItemId = @catalogItemId
                                              LIMIT 1;
                                              """;
