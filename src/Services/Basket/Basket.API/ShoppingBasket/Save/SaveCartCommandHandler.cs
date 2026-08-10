@@ -5,27 +5,37 @@ using Promotion.Grpc.Protos;
 
 namespace Basket.API.ShoppingBasket.Save;
 
-public class SaveCartCommandHandler(ICartRepository cartRepository, PromoService.PromoServiceClient promoService) : ICommandHandler<SaveCartCommand, SaveCartResult>
+public class SaveCartCommandHandler(ICartRepository cartRepository, PromoService.PromoServiceClient promoService) 
+    : ICommandHandler<SaveCartCommand, SaveCartResult>
 {
     public async Task<SaveCartResult> Handle(SaveCartCommand command, CancellationToken cancellationToken)
     {
+        var existingCart = await cartRepository.GetCartAsync(command.AccountName, cancellationToken);
+        
         var cart = new ShoppingCart
         {
             AccountName = command.AccountName,
             Items = command.Items
         };
         
-        await ApplyPromotionsToCartAsync(cart, cancellationToken);       
+        await ApplyPromotionsToCartAsync(cart, existingCart, cancellationToken);       
         await cartRepository.SaveCartAsync(cart, cancellationToken);
         
         return new SaveCartResult(cart.AccountName);
     }
 
-    private async Task ApplyPromotionsToCartAsync(ShoppingCart cart, CancellationToken cancellationToken)
+    private async Task ApplyPromotionsToCartAsync(ShoppingCart cart, ShoppingCart? existingCart, CancellationToken cancellationToken)
     {
         foreach (var item in cart.Items)
         {
-            var discount = await GetDiscountForItemAsync(cancellationToken, item);
+            var existingItem = existingCart?.Items.FirstOrDefault(i => i.ItemId == item.ItemId);
+
+            if (existingItem is not null && item.UnitPrice == existingItem.UnitPrice)
+            {
+                continue;
+            }
+            
+            var discount = await GetDiscountForItemAsync(item, cancellationToken);
             if (discount is null) continue;
 
             item.UnitPrice = ApplyDiscount(item.UnitPrice, (decimal)discount.Value);
@@ -38,7 +48,7 @@ public class SaveCartCommandHandler(ICartRepository cartRepository, PromoService
         return newPrice < 0 ? 0m : newPrice;
     }
 
-    private async Task<PromoModel?> GetDiscountForItemAsync(CancellationToken cancellationToken, ShoppingCartItem item)
+    private async Task<PromoModel?> GetDiscountForItemAsync(ShoppingCartItem item, CancellationToken cancellationToken)
     {
         var getPromoRequest = new GetPromoRequest
         {
