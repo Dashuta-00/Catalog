@@ -1,11 +1,12 @@
 ﻿using Basket.API.Infrastructure;
 using Basket.API.Models.ShoppingCart;
 using Common.Kernel.CQRS.Commands;
+using Grpc.Core;
 using Promotion.Grpc.Protos;
 
 namespace Basket.API.ShoppingBasket.Save;
 
-public class SaveCartCommandHandler(ICartRepository cartRepository, PromoService.PromoServiceClient promoService) 
+public class SaveCartCommandHandler(ICartRepository cartRepository, PromoService.PromoServiceClient promoService, ILogger<SaveCartCommandHandler> logger) 
     : ICommandHandler<SaveCartCommand, SaveCartResult>
 {
     public async Task<SaveCartResult> Handle(SaveCartCommand command, CancellationToken cancellationToken)
@@ -34,11 +35,22 @@ public class SaveCartCommandHandler(ICartRepository cartRepository, PromoService
             {
                 continue;
             }
-            
-            var discount = await GetDiscountForItemAsync(item, cancellationToken);
-            if (discount is null) continue;
 
-            item.UnitPrice = ApplyDiscount(item.UnitPrice, (decimal)discount.Value);
+            try
+            {
+                var discount = await GetDiscountForItemAsync(item, cancellationToken);
+                if (discount is null) continue;
+
+                item.UnitPrice = ApplyDiscount(item.UnitPrice, (decimal)discount.Value);
+            }
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded)
+            {
+                logger.LogWarning(ex, "Таймаут при получении скидки для товара {ItemId}", item.ItemId);
+            }
+            catch (RpcException ex)
+            {
+                logger.LogError(ex, "Ошибка при получении скидки для товара {ItemId}: {Message}", item.ItemId, ex.Message);
+            }
         }
     }
 
@@ -54,8 +66,11 @@ public class SaveCartCommandHandler(ICartRepository cartRepository, PromoService
         {
             CatalogItemId = item.ItemId.ToString()
         };
-
-        var discount = await promoService.GetPromoAsync(getPromoRequest, cancellationToken: cancellationToken);
+        
+        var discount = await promoService.GetPromoAsync(
+            getPromoRequest, 
+            deadline: DateTime.UtcNow.AddSeconds(2), 
+            cancellationToken: cancellationToken);
         return discount;
     }
 }
