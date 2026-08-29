@@ -75,7 +75,7 @@ services:
     
   checkout_db:
     container_name: checkout-db-dev
-    image: postgres
+    image: postgres:16
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=12345678
