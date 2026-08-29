@@ -1,3 +1,4 @@
+using Checkout.Domain.Repositories;
 using Checkout.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +15,9 @@ public static class DependencyInjection
 		{
 			options.UseNpgsql(pgConnection);
 		});
+
+		services.AddScoped<IOrderRepository, IOrderRepository>();
+		
 		return services;
 	}
 }
