@@ -1,7 +1,3 @@
-using Checkout.API;
-using Checkout.Application;
-using Checkout.Infrastructure;
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddApiServices(builder.Configuration);
@@ -10,6 +6,6 @@ builder.Services.AddApplicationServices(builder.Configuration);
 
 var app = builder.Build();
 
-app.UseApiServices();
+await app.UseApiServices();
 
 app.Run();

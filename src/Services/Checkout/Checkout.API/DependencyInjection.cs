@@ -1,3 +1,5 @@
+using Checkout.Infrastructure.Data.Extensions;
+
 namespace Checkout.API;
 
 public static class DependencyInjection
@@ -10,11 +12,13 @@ public static class DependencyInjection
 		return services;
 	}
 
-	public static WebApplication UseApiServices(this WebApplication app)
+	public static async Task<WebApplication> UseApiServices(this WebApplication app)
 	{
 		app.UseSwagger();
 		app.UseSwaggerUI();
 
+		await app.Services.MigrateAndSeedDatabaseAsync();
+		
 		app.MapGet("/", () => "Hello World!");
 
 		return app;

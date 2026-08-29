@@ -4,7 +4,7 @@ namespace Checkout.Infrastructure.Data.Seed;
 
 public class OrderContextSeed
 {
-    public static async void SeedAsync(OrderContext dbContext)
+    public static async Task SeedAsync(OrderContext dbContext)
     {
         if (!await dbContext.Orders.AnyAsync())
         {
