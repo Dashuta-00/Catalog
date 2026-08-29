@@ -73,8 +73,21 @@ services:
         condition: service_healthy
     restart: unless-stopped
     
+  checkout_db:
+    container_name: checkout-db-dev
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=12345678
+      - POSTGRES_DB=checkout-db
+    restart: always
+    ports:
+      - "7104:5432"
+    volumes:
+      - postgres_checkout:/var/lib/postgresql/data/
 volumes:
   postgres_catalog:
   postgres_basket:
   redis_basket:
   mysql_promotion:
+  postgres_checkout:
