@@ -1,5 +1,6 @@
 using Carter;
 using Checkout.Infrastructure.Data.Extensions;
+using Scalar.AspNetCore;
 
 namespace Checkout.API;
 
@@ -9,8 +10,16 @@ public static class DependencyInjection
 	{
 		services.AddCarter();
 		
-		services.AddEndpointsApiExplorer();
-		services.AddSwaggerGen();
+		services.AddOpenApi(options =>
+		{
+			options.AddDocumentTransformer((document, _, _) =>
+			{
+				document.Info.Title = "Checkout API";
+				document.Info.Version = "v1";
+				document.Info.Description = "Checkout Service API";
+				return Task.CompletedTask;
+			});
+		});
 		
 		return services;
 	}
@@ -19,13 +28,11 @@ public static class DependencyInjection
 	{
 		app.MapCarter();
 		
-		app.UseSwagger();
-		app.UseSwaggerUI();
-
+		app.MapScalarApiReference(); 
+		app.MapOpenApi();
+		
 		await app.Services.MigrateAndSeedDatabaseAsync();
 		
-		app.MapGet("/", () => "Hello World!");
-
 		return app;
 	}
 }

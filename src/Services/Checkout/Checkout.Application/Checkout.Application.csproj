@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\Common.Kernel\Common.Kernel.csproj" />
-    <ProjectReference Include="..\..\Basket\Basket.API\Basket.API.csproj" />
     <ProjectReference Include="..\Checkout.Domain\Checkout.Domain.csproj" />
   </ItemGroup>
   <ItemGroup>

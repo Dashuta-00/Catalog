@@ -1,5 +1,4 @@
-﻿using Common.Kernel.CQRS.Commands;
-using FluentValidation;
+﻿using FluentValidation;
 using MediatR;
 
 namespace Common.Kernel.Behaviors;
@@ -7,7 +6,7 @@ namespace Common.Kernel.Behaviors;
 public class ValidationBehavior<TRequest, TResponse>
     (IEnumerable<IValidator<TRequest>> validators) 
     : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : ICommand<TResponse>
+    where TRequest : IRequest<TResponse>
 {
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
