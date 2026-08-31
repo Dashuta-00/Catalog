@@ -1,5 +1,6 @@
 using Carter;
 using Checkout.Infrastructure.Data.Extensions;
+using Common.Kernel.Exceptions.Handler;
 using Scalar.AspNetCore;
 
 namespace Checkout.API;
@@ -8,6 +9,8 @@ public static class DependencyInjection
 {
 	public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration configuration)
 	{
+		services.AddExceptionHandler<CustomExceptionHandler>();
+		
 		services.AddCarter();
 		
 		services.AddOpenApi(options =>
@@ -26,6 +29,8 @@ public static class DependencyInjection
 
 	public static async Task<WebApplication> UseApiServices(this WebApplication app)
 	{
+		app.UseExceptionHandler(_ => { });
+		
 		app.MapCarter();
 		
 		app.MapScalarApiReference(); 

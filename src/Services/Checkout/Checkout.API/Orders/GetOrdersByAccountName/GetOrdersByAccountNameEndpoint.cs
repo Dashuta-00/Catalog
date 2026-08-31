@@ -4,7 +4,7 @@ using Checkout.Application.Orders.Queries.GetOrdersByAccountName.DTOs;
 using Mapster;
 using MediatR;
 
-namespace Checkout.API.Orders;
+namespace Checkout.API.Orders.GetOrdersByAccountName;
 
 public record GetOrdersByAccountNameRequest(string AccountName);
 public record GetOrdersByAccountNameResponse(IEnumerable<OrderDto> Orders);
