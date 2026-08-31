@@ -19,7 +19,7 @@ public class CreateOrderCommandHandler(IOrderRepository orderRepository)
         order.CurrentOrderStatus = OrderStatus.Draft;
         order.CurrentPaymentStatus = PaymentStatus.Pending;
         
-        await orderRepository.AddAsync(order);
+        await orderRepository.AddAsync(order, cancellationToken);
 
         return new CreateOrderResultDto(order.Id, "Заказ создан");
     }

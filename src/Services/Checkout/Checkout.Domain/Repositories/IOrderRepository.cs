@@ -4,5 +4,6 @@ namespace Checkout.Domain.Repositories;
 
 public interface IOrderRepository : IRepository<Order>
 {
-    Task<IEnumerable<Order>> GetOrdersByAccountName(string accountName);
+    Task<IEnumerable<Order>> GetOrdersByAccountName(string accountName, CancellationToken cancellationToken);
+    Task<bool> DeleteOrderById(Guid id, CancellationToken cancellationToken);
 }

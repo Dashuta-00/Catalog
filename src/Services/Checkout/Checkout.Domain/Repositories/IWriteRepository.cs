@@ -5,7 +5,7 @@ namespace Checkout.Domain.Repositories;
 public interface IWriteRepository<T>
     where T : IAggregateRoot
 {
-    Task AddAsync(T entity);
-    Task<bool> UpdateAsync(T entity);
-    Task<bool> DeleteAsync(T entity);
+    Task AddAsync(T entity, CancellationToken cancellationToken);
+    Task<bool> UpdateAsync(T entity, CancellationToken cancellationToken);
+    Task<bool> DeleteAsync(T entity, CancellationToken cancellationToken);
 }

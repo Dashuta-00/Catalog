@@ -14,7 +14,7 @@ public class GetOrdersByAccountNameQueryHandler(IOrderRepository orderRepository
 {
     public async Task<GetOrdersByAccountNameResult> Handle(GetOrdersByAccountNameQuery query, CancellationToken cancellationToken)
     {
-        var orders = await orderRepository.GetOrdersByAccountName(query.AccountName);
+        var orders = await orderRepository.GetOrdersByAccountName(query.AccountName, cancellationToken);
 
         return new GetOrdersByAccountNameResult(orders);
     }

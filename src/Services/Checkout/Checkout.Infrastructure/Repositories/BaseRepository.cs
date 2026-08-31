@@ -12,45 +12,46 @@ public abstract class BaseRepository<T>(OrderContext context)
 {
     protected readonly OrderContext DbContext = context;
     
-    public virtual async Task<IReadOnlyList<T>> GetAllAsync()
+    public virtual async Task<IReadOnlyList<T>> GetAllAsync(CancellationToken cancellationToken)
     {
-        var result = await DbContext.Set<T>().ToListAsync();
+        var result = await DbContext.Set<T>().ToListAsync(cancellationToken);
         return result;
     }
 
-    public virtual async Task<T?> GetByIdAsync(Guid id)
+    public virtual async Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         var result = await DbContext
             .Set<T>()
             .FirstOrDefaultAsync(e => 
-                EF.Property<Guid>(e, "Id") == id);
+                EF.Property<Guid>(e, "Id") == id,
+                cancellationToken);
 
         return result;
     }
 
-    public virtual async Task<IReadOnlyList<T>> FindAsync(Expression<Func<T, bool>> predicate)
+    public virtual async Task<IReadOnlyList<T>> FindAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken)
     {
         var result = await DbContext.Set<T>()
             .Where(predicate)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
         return result;
     }
 
-    public virtual async Task AddAsync(T entity)
+    public virtual async Task AddAsync(T entity, CancellationToken cancellationToken)
     {
-        await DbContext.Set<T>().AddAsync(entity);
-        await DbContext.SaveChangesAsync();
+        await DbContext.Set<T>().AddAsync(entity, cancellationToken);
+        await DbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public virtual async Task<bool> UpdateAsync(T entity)
+    public virtual async Task<bool> UpdateAsync(T entity, CancellationToken cancellationToken)
     {
         DbContext.Set<T>().Update(entity);
-        return await DbContext.SaveChangesAsync() > 0;
+        return await DbContext.SaveChangesAsync(cancellationToken) > 0;
     }
 
-    public virtual async Task<bool> DeleteAsync(T entity)
+    public virtual async Task<bool> DeleteAsync(T entity, CancellationToken cancellationToken)
     {
         DbContext.Set<T>().Remove(entity);
-        return await DbContext.SaveChangesAsync() > 0;
+        return await DbContext.SaveChangesAsync(cancellationToken) > 0;
     }
 }
