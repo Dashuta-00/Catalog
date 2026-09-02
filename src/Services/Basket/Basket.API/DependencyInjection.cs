@@ -4,7 +4,10 @@ using Carter;
 using Common.Kernel.Behaviors;
 using Common.Kernel.Exceptions.Handler;
 using Common.Kernel.OpenApi.Filters;
+using Common.Messaging.Extensions;
 using FluentValidation;
+using Mapster;
+using MapsterMapper;
 using Marten;
 using Promotion.Grpc.Protos;
 using Scalar.AspNetCore;
@@ -70,6 +73,13 @@ public static class DependencyInjection
         {
             options.Address =  new Uri(promotionService);
         });
+
+        services.AddBroker(configuration);
+
+        TypeAdapterConfig.GlobalSettings.Scan(assembly);
+        
+        services.AddSingleton(TypeAdapterConfig.GlobalSettings);
+        services.AddScoped<IMapper, ServiceMapper>();
         
         return services;
     }

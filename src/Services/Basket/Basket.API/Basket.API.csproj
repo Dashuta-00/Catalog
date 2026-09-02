@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\Common.Kernel\Common.Kernel.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Common.Messaging\Common.Messaging.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Protobuf Include="..\..\Promotion\Promotion.Grpc\Protos\promo.proto" GrpcServices="Client" Link="Protos\promo.proto" />
