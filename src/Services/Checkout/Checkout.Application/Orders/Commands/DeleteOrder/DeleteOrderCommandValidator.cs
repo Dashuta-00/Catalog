@@ -2,10 +2,10 @@
 
 namespace Checkout.Application.Orders.Commands.DeleteOrder;
 
-public class DeleteOrderValidator
+public class DeleteOrderCommandValidator
     : AbstractValidator<DeleteOrderCommand>
 {
-    public DeleteOrderValidator()
+    public DeleteOrderCommandValidator()
     {
         RuleFor(o => o.OrderId)
             .NotEmpty()
