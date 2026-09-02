@@ -20,6 +20,7 @@
   </Folder>
   <Folder Name="/src/Shared/">
     <Project Path="src/Shared/Common.Kernel/Common.Kernel.csproj" />
+    <Project Path="src/Shared/Common.Messaging/Common.Messaging.csproj" />
   </Folder>
   <Project Path="C:\StepikNet\Marketplace\src\Services\Checkout\Checkout.API\Checkout.API.csproj" />
   <Project Path="C:\StepikNet\Marketplace\src\Services\Checkout\Checkout.Application\Checkout.Application.csproj" />

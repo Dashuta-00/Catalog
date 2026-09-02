@@ -55,23 +55,42 @@ services:
       timeout: 2s
       retries: 10
   
-  promotion_api:
-    container_name: promotion-api
-    platform: linux/amd64
-    build:
-      context: .
-      dockerfile: ./dockerfile-promotion
-      args:
-        - BUILDKIT_INLINE_CACHE=0
-    ports:
-      - "7003:8080"
-      - "7013:8081"
+  rabbit_mq:
+    container_name: rabbit-mq-dev
+    hostname: bookshop-mq
+    image: rabbitmq:4.0-management
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-    depends_on:
-      promotion_db:
-        condition: service_healthy
-    restart: unless-stopped
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    restart: always
+    ports:
+      - "5672:5672" #основной для взаимод-я с очередями. исп-ся клиентскими приложениями для подключения через amqp протокол. именно через него происходит публикация сообщений, подписка на очереди - все операции с сообшениями
+      - "15672:15672" #web-интерфейс управления. админка. веб-морда. ui для мониторингв
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 15
+  
+#  promotion_api:
+#    container_name: promotion-api
+#    platform: linux/amd64
+#    build:
+#      context: .
+#      dockerfile: ./dockerfile-promotion
+#      args:
+#        - BUILDKIT_INLINE_CACHE=0
+#    ports:
+#      - "7003:8080"
+#      - "7013:8081"
+#    environment:
+#      - ASPNETCORE_ENVIRONMENT=Production
+#    depends_on:
+#      promotion_db:
+#        condition: service_healthy
+#    restart: unless-stopped
     
   checkout_db:
     container_name: checkout-db-dev
@@ -92,3 +111,4 @@ volumes:
   redis_basket:
   mysql_promotion:
   postgres_checkout:
+  rabbitmq_data:
