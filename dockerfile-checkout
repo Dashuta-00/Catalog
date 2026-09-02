@@ -1,0 +1,35 @@
+﻿# docker build --no-cache -t checkout.api:latest -f dockerfile-checkout .
+
+#docker run -d \
+#  --name checkout.api \
+#  --network marketplace_default \
+#  -p 7204:8080 \
+#  checkout.api:latest
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
+WORKDIR /app
+EXPOSE 8080
+
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+COPY ["src/Services/Checkout/Checkout.API/Checkout.API.csproj", "src/Services/Checkout/Checkout.API/"]
+COPY ["src/Services/Checkout/Checkout.Application/Checkout.Application.csproj", "src/Services/Checkout/Checkout.Application/"]
+COPY ["src/Services/Checkout/Checkout.Domain/Checkout.Domain.csproj", "src/Services/Checkout/Checkout.Domain/"]
+COPY ["src/Services/Checkout/Checkout.Infrastructure/Checkout.Infrastructure.csproj", "src/Services/Checkout/Checkout.Infrastructure/"]
+COPY ["src/Shared/Common.Kernel/Common.Kernel.csproj", "src/Shared/Common.Kernel/"]
+
+RUN dotnet restore "src/Services/Checkout/Checkout.API/Checkout.API.csproj"
+
+COPY . .
+
+RUN dotnet build "src/Services/Checkout/Checkout.API/Checkout.API.csproj" -c Release -o /app/build
+FROM build AS publish
+RUN dotnet publish "src/Services/Checkout/Checkout.API/Checkout.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+
+COPY --from=publish /app/publish .
+
+ENTRYPOINT ["dotnet", "Checkout.API.dll"]
