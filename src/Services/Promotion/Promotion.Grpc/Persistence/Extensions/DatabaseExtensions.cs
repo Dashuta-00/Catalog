@@ -7,7 +7,7 @@ namespace Promotion.Grpc.Persistence.Extensions;
 
 public static class DatabaseExtensions
 {
-    public static async Task SeedAsync(IDbConnection connection, ILogger logger, int maxRetries = 5)
+    public static async Task SeedAsync<T>(IDbConnection connection, ILogger<T> logger, int maxRetries = 5)
     {
         var delay = TimeSpan.FromSeconds(1);
         Exception lastException = default!;

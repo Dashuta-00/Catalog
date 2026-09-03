@@ -1,10 +1,13 @@
 ﻿using System.Data;
+using Common.Logging.Extensions;
 using MySqlConnector;
 using Promotion.Grpc.Configuration;
+using Promotion.Grpc.Interceptors;
 using Promotion.Grpc.Persistence.Extensions;
 using Promotion.Grpc.Persistence.Interfaces;
 using Promotion.Grpc.Persistence.Repositories;
 using Promotion.Grpc.Services;
+using Serilog;
 
 namespace Promotion.Grpc;
 
@@ -17,8 +20,17 @@ public static class DependencyInjection
         
         services.AddScoped<IDbConnection>(_ =>
             new MySqlConnection(mySqlConnectionString));
+
+        services.AddSingleton<RequestLoggingInterceptor>();
         
-        services.AddGrpc();
+        services.AddGrpc(options =>
+        {
+            options.Interceptors.Add<RequestLoggingInterceptor>();
+            options.EnableDetailedErrors = true;
+        });
+        
+        services.AddCommonLogging(configuration);
+        
         services.AddGrpcReflection();
         
         var assembly = typeof(Program).Assembly;
