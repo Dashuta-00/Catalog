@@ -57,7 +57,6 @@ services:
   
   rabbit_mq:
     container_name: rabbit-mq-dev
-    hostname: bookshop-mq
     image: rabbitmq:4.0-management
     environment:
       - RABBITMQ_DEFAULT_USER=guest

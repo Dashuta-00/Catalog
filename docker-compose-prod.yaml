@@ -73,9 +73,14 @@ services:
       # - GrpcServices__PromotionService=...
       # - MediatR__LicenseKey=...
     depends_on:
-      - basket_db
-      - basket_redis
-      - promotion_api
+      basket_db:
+        condition: service_started
+      basket_redis:
+        condition: service_started
+      promotion_api:
+        condition: service_started
+      rabbit_mq:
+        condition: service_healthy
     restart: unless-stopped
     
   promotion_db:
@@ -114,7 +119,7 @@ services:
     restart: unless-stopped
     
   checkout_db:
-    container_name: checkout-db-dev
+    container_name: checkout-db-prod
     image: postgres:16
     environment:
       - POSTGRES_USER=postgres
@@ -147,7 +152,27 @@ services:
     depends_on:
       checkout_db:
         condition: service_healthy
+      rabbit_mq:
+        condition: service_healthy
     restart: unless-stopped
+    
+  rabbit_mq:
+    container_name: rabbit-mq-prod
+    image: rabbitmq:4.0-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    restart: always
+    ports:
+      - "5672:5672" #основной для взаимод-я с очередями. исп-ся клиентскими приложениями для подключения через amqp протокол. именно через него происходит публикация сообщений, подписка на очереди - все операции с сообшениями
+      - "15672:15672" #web-интерфейс управления. админка. веб-морда. ui для мониторингв
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      interval: 10s
+      timeout: 10s
+      retries: 20
 
 volumes:
   postgres_catalog_prod:
@@ -155,3 +180,4 @@ volumes:
   redis_basket_prod:
   mysql_promotion:
   postgres_checkout:
+  rabbitmq_data:
