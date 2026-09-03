@@ -18,6 +18,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\Common.Kernel\Common.Kernel.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Common.Logging\Common.Logging.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Protobuf Include="Protos\promo.proto" />

@@ -19,6 +19,7 @@ COPY ["src/Services/Checkout/Checkout.Domain/Checkout.Domain.csproj", "src/Servi
 COPY ["src/Services/Checkout/Checkout.Infrastructure/Checkout.Infrastructure.csproj", "src/Services/Checkout/Checkout.Infrastructure/"]
 COPY ["src/Shared/Common.Kernel/Common.Kernel.csproj", "src/Shared/Common.Kernel/"]
 COPY ["src/Shared/Common.Messaging/Common.Messaging.csproj", "src/Shared/Common.Messaging/"]
+COPY ["src/Shared/Common.Logging/Common.Logging.csproj", "src/Shared/Common.Logging/"]
 
 RUN dotnet restore "src/Services/Checkout/Checkout.API/Checkout.API.csproj"
 

@@ -26,4 +26,5 @@
   <Project Path="C:\StepikNet\Marketplace\src\Services\Checkout\Checkout.Application\Checkout.Application.csproj" />
   <Project Path="C:\StepikNet\Marketplace\src\Services\Checkout\Checkout.Domain\Checkout.Domain.csproj" />
   <Project Path="C:\StepikNet\Marketplace\src\Services\Checkout\Checkout.Infrastructure\Checkout.Infrastructure.csproj" />
+  <Project Path="src/Shared/Common.Logging/Common.Logging.csproj" />
 </Solution>
