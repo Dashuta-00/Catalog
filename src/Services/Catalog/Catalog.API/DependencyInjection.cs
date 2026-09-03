@@ -1,6 +1,8 @@
 using Asp.Versioning;
 using Catalog.Domain.Repositories;
 using Catalog.Infrastructure.Repositories;
+using Common.Logging.Extensions;
+using Common.Logging.Middleware;
 using Scalar.AspNetCore;
 
 namespace Catalog.API;
@@ -57,12 +59,16 @@ public static class DependencyInjection
 			config.LicenseKey = licenseKey;
 			config.RegisterServicesFromAssembly(assembly);
 		});
+
+		services.AddCommonLogging(configuration);
 		
 		return services;
 	}
 
 	public static WebApplication UseApiServices(this WebApplication app)
 	{
+		app.UseMiddleware<RequestLoggingMiddleware>();
+		
 		app.MapControllers();
 		
 		app.MapOpenApi();

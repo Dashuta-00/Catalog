@@ -4,6 +4,8 @@ using Carter;
 using Common.Kernel.Behaviors;
 using Common.Kernel.Exceptions.Handler;
 using Common.Kernel.OpenApi.Filters;
+using Common.Logging.Extensions;
+using Common.Logging.Middleware;
 using Common.Messaging.Extensions;
 using FluentValidation;
 using Mapster;
@@ -81,11 +83,15 @@ public static class DependencyInjection
         services.AddSingleton(TypeAdapterConfig.GlobalSettings);
         services.AddScoped<IMapper, ServiceMapper>();
         
+        services.AddCommonLogging(configuration);
+        
         return services;
     }
 
     public static WebApplication UseApiServices(this WebApplication app)
     {
+        app.UseMiddleware<RequestLoggingMiddleware>();
+
         app.UseExceptionHandler(options => { });
         app.MapCarter();
 

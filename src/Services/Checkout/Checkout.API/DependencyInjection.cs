@@ -1,6 +1,8 @@
 using Carter;
 using Checkout.Infrastructure.Data.Extensions;
 using Common.Kernel.Exceptions.Handler;
+using Common.Logging.Extensions;
+using Common.Logging.Middleware;
 using Scalar.AspNetCore;
 
 namespace Checkout.API;
@@ -24,11 +26,15 @@ public static class DependencyInjection
 			});
 		});
 		
+		services.AddCommonLogging(configuration);
+		
 		return services;
 	}
 
 	public static async Task<WebApplication> UseApiServices(this WebApplication app)
 	{
+		app.UseMiddleware<RequestLoggingMiddleware>();
+
 		app.UseExceptionHandler(_ => { });
 		
 		app.MapCarter();
