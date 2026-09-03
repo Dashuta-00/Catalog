@@ -104,6 +104,53 @@ services:
     volumes:
       - postgres_checkout:/var/lib/postgresql/data/
       
+  elasticsearch:
+    container_name: elasticsearch-dev
+    image: elasticsearch:9.4.1
+    environment:
+      - node.name=elasticsearch-dev
+      - cluster.name=es-docker-cluster-dev
+      - discovery.type: single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS"=-Xms1g -Xmx1g"
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+      - action.auto_create_index=true
+      - cluster.routing.allocation.disk.threshold_enabled=false 
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      notife:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      
+  kibana:
+    container_name: kibana-dev
+    image: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - SERVER_NAME=kibana-prod
+      - SERVER_HOST=0.0.0.0
+      - ELASTICSEARCH_USERNAME=
+      - ELASTICSEARCH_PASSWORD=
+    ports:
+      - "5601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: always
+    
 volumes:
   postgres_catalog:
   postgres_basket:
@@ -111,3 +158,4 @@ volumes:
   mysql_promotion:
   postgres_checkout:
   rabbitmq_data:
+  elasticsearch_data:
