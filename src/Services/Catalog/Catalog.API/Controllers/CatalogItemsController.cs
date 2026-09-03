@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Catalog.API.Controllers;
 
+[ApiVersion("1")]
+[ApiExplorerSettings(GroupName = "v1")]
+[Route("api/v{version:apiVersion}/[controller]")] 
 public class CatalogItemsController : ApiController
 {
     [HttpGet]

@@ -1,14 +1,10 @@
-﻿using Checkout.Application.Orders.Commands.UpdateOrder.DTOs;
-using Checkout.Domain.Orders;
+﻿using Checkout.Domain.Orders;
 using Checkout.Domain.Repositories;
 using Common.Kernel.CQRS.Commands;
 using Common.Kernel.Exceptions;
 using Mapster;
 
 namespace Checkout.Application.Orders.Commands.UpdateOrder;
-
-public record UpdateOrderCommand(string OrderId, UpdateOrderDto OrderData)
-    : ICommand<UpdateOrderResult>;
 
 public record UpdateOrderResult(bool IsSuccess);
 

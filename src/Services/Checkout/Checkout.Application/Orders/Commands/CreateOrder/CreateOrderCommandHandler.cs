@@ -7,9 +7,6 @@ using Mapster;
 
 namespace Checkout.Application.Orders.Commands.CreateOrder;
 
-public record CreateOrderCommand(CreateOrderDto OrderData)
-    : ICommand<CreateOrderResultDto>;
-
 public class CreateOrderCommandHandler(IOrderRepository orderRepository)
     :ICommandHandler<CreateOrderCommand, CreateOrderResultDto>
 {

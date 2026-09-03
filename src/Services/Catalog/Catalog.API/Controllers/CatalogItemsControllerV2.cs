@@ -7,7 +7,7 @@ namespace Catalog.API.Controllers;
 
 [ApiVersion("2")]
 [ApiExplorerSettings(GroupName = "v2")]
-[Route("api/v{version:apiVersion}/CatalogItems")]
+[Route("api/v{version:apiVersion}/[controller]")] 
 public class CatalogItemsControllerV2 : ApiController
 {
     [HttpGet]
@@ -18,5 +18,4 @@ public class CatalogItemsControllerV2 : ApiController
         var result = await Mediator.Send(query);
         return Ok(result);
     }
-
 }

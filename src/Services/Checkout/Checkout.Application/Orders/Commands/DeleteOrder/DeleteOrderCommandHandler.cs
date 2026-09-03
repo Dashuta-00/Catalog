@@ -5,8 +5,6 @@ using FluentValidation;
 
 namespace Checkout.Application.Orders.Commands.DeleteOrder;
 
-public record DeleteOrderCommand(string OrderId) : ICommand<DeleteOrderResultDto>;
-
 public class DeleteOrderCommandHandler(IOrderRepository orderRepository)
     : ICommandHandler<DeleteOrderCommand, DeleteOrderResultDto>
 {

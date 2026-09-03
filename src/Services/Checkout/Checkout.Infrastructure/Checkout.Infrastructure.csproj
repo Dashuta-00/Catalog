@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\Common.Messaging\Common.Messaging.csproj" />
     <ProjectReference Include="..\Checkout.Application\Checkout.Application.csproj" />
   </ItemGroup>
   <ItemGroup>
