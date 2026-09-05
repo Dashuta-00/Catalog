@@ -105,23 +105,24 @@ services:
       - postgres_checkout:/var/lib/postgresql/data/
       
   elasticsearch:
+    mem_limit: 2g
     container_name: elasticsearch-dev
-    image: elasticsearch:9.4.1
+    image: elasticsearch:9.0.3
     environment:
       - node.name=elasticsearch-dev
       - cluster.name=es-docker-cluster-dev
-      - discovery.type: single-node
+      - discovery.type=single-node
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS"=-Xms1g -Xmx1g"
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
       - xpack.security.enabled=false
       - xpack.security.enrollment.enabled=false
       - action.auto_create_index=true
-      - cluster.routing.allocation.disk.threshold_enabled=false 
+      - cluster.routing.allocation.disk.threshold_enabled=false
     ulimits:
       memlock:
         soft: -1
         hard: -1
-      notife:
+      nofile:
         soft: 65536
         hard: 65536
     volumes:
@@ -137,10 +138,10 @@ services:
       
   kibana:
     container_name: kibana-dev
-    image: kibana
+    image: kibana:9.0.3
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - SERVER_NAME=kibana-prod
+      - SERVER_NAME=kibana-dev
       - SERVER_HOST=0.0.0.0
       - ELASTICSEARCH_USERNAME=
       - ELASTICSEARCH_PASSWORD=

@@ -23,7 +23,7 @@ public static class LoggingServiceCollectionExtensions
             {
                 IndexFormat = "marketplace-logs-{0:yyyy.MM.dd}",
                 AutoRegisterTemplate = true,
-                AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv8,
+                AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv7,
                 TemplateName = "marketplace-template",
                 NumberOfShards = 1,
                 NumberOfReplicas = 0

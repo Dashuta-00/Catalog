@@ -29,7 +29,10 @@ services:
       # - ConnectionStrings__PgConnection=...
       # - MediatR__LicenseKey=...
     depends_on:
-      - catalog_db
+      catalog_db:
+        condition: service_started
+      elasticsearch:
+        condition: service_healthy
     restart: unless-stopped
         
 #basket
@@ -81,6 +84,8 @@ services:
         condition: service_started
       rabbit_mq:
         condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
     restart: unless-stopped
     
   promotion_db:
@@ -115,6 +120,8 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
     depends_on:
       promotion_db:
+        condition: service_healthy
+      elasticsearch:
         condition: service_healthy
     restart: unless-stopped
     
@@ -154,6 +161,8 @@ services:
         condition: service_healthy
       rabbit_mq:
         condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
     restart: unless-stopped
     
   rabbit_mq:
@@ -173,6 +182,82 @@ services:
       interval: 10s
       timeout: 10s
       retries: 20
+      
+  elasticsearch:
+    mem_limit: 2g
+    container_name: elasticsearch-prod
+    image: elasticsearch:9.0.3
+    environment:
+      - node.name=elasticsearch-prod
+      - cluster.name=es-docker-cluster-prod
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+      - action.auto_create_index=true
+      - cluster.routing.allocation.disk.threshold_enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  kibana:
+    container_name: kibana-prod
+    image: kibana:9.0.3
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - SERVER_NAME=kibana-prod
+      - SERVER_HOST=0.0.0.0
+      - ELASTICSEARCH_USERNAME=
+      - ELASTICSEARCH_PASSWORD=
+    ports:
+      - "5601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: always
+
+  k6-catalog-load:
+    container_name: k6-catalog-load-prod
+    image: grafana/k6
+    volumes:
+      - ./k6:/scripts
+    working_dir: /scripts
+    entrypoint: ["k6", "run", "catalog-api-load-test.js"]
+    environment:
+      - BASE_URL_CATALOG=http://catalog_api:8080
+    depends_on:
+      - catalog_api
+    
+  k6-catalog-create:
+    container_name: k6-catalog-create-prod
+    image: grafana/k6
+    volumes:
+      - ./k6:/scripts
+    working_dir: /scripts
+    entrypoint: [ "k6", "run", "catalog-api-create-items-test.js" ]
+    environment:
+      - BASE_URL_CATALOG=http://catalog_api:8080
+    depends_on:
+      catalog_api:
+        condition: service_started
+      elasticsearch:
+        condition: service_healthy
+
 
 volumes:
   postgres_catalog_prod:
@@ -181,3 +266,5 @@ volumes:
   mysql_promotion:
   postgres_checkout:
   rabbitmq_data:
+  elasticsearch_data:
+  ./k6:
